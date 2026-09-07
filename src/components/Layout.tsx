@@ -9,6 +9,7 @@ const NAV = [
   { to: "/institutes", label: "Institutes", end: false },
   { to: "/universities", label: "Affiliating universities", end: false },
   { to: "/framework", label: "NAAC framework", end: false },
+  { to: "/administrators", label: "Administrators", end: false },
 ];
 
 export function Layout({

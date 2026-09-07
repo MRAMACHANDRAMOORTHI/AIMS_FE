@@ -4,6 +4,7 @@ import { api } from "./api/client";
 import { clearToken, currentToken, loadToken, onSessionLost } from "./api/auth";
 import type { PlatformAdmin } from "./api/types";
 import { Layout } from "./components/Layout";
+import { Administrators } from "./pages/Administrators";
 import { Dashboard } from "./pages/Dashboard";
 import { Framework } from "./pages/Framework";
 import { InstituteDetail } from "./pages/InstituteDetail";
@@ -80,6 +81,10 @@ export default function App() {
         <Route path="/universities" element={<Universities />} />
         <Route path="/universities/:id" element={<UniversityDetail />} />
         <Route path="/framework" element={<Framework />} />
+        <Route
+          path="/administrators"
+          element={<Administrators me={session.admin} />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

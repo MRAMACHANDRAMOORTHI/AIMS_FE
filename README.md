@@ -151,6 +151,7 @@ vocabulary is duplicated here.
 | `/universities` | Affiliating universities, with inline create |
 | `/universities/:id` | One university, its inherited settings, and the colleges naming it |
 | `/framework` | The NAAC framework: three manuals, seven criteria, marks at UG and PG |
+| `/administrators` | Platform administrators — create, deactivate, reinstate |
 
 The institute list uses the API's **summary** shape and the detail page uses the
 **full** shape. That is deliberate on the backend's side — resolving a mark
