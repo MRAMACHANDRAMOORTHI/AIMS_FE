@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useApi } from "../api/hooks";
-import type { Health } from "../api/types";
+import type { Health, PlatformAdmin } from "../api/types";
+import { Button } from "./ui";
 
 const NAV = [
   { to: "/", label: "Overview", end: true },
@@ -10,10 +11,18 @@ const NAV = [
   { to: "/framework", label: "NAAC framework", end: false },
 ];
 
-export function Layout({ children }: { children: ReactNode }) {
+export function Layout({
+  children,
+  admin,
+  onSignOut,
+}: {
+  children: ReactNode;
+  admin: PlatformAdmin;
+  onSignOut: () => void;
+}) {
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar admin={admin} onSignOut={onSignOut} />
       <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
@@ -21,7 +30,13 @@ export function Layout({ children }: { children: ReactNode }) {
   );
 }
 
-function Sidebar() {
+function Sidebar({
+  admin,
+  onSignOut,
+}: {
+  admin: PlatformAdmin;
+  onSignOut: () => void;
+}) {
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white md:flex">
       <div className="border-b border-ink-100 px-5 py-5">
@@ -51,6 +66,18 @@ function Sidebar() {
       </nav>
 
       <ServerStatus />
+
+      <div className="border-t border-ink-100 px-5 py-4">
+        <p className="truncate text-xs font-medium text-ink-800" title={admin.email}>
+          {admin.name}
+        </p>
+        <p className="mb-2 truncate text-xs text-ink-400" title={admin.email}>
+          {admin.email}
+        </p>
+        <Button variant="ghost" onClick={onSignOut}>
+          Sign out
+        </Button>
+      </div>
     </aside>
   );
 }

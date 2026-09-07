@@ -35,6 +35,35 @@ npm run dev         # http://localhost:5173
 
 ---
 
+## Signing in
+
+The console signs in a **platform administrator** — the principal that manages
+institutes across tenants. Users of a single institute sign in against their own
+institute, which is the ERP's job, not this console's.
+
+There is no sign-up screen, because there is no sign-up. Make an account on the
+server:
+
+```bash
+cd ../AIMS_BE
+mix aims.admin create you@example.com "Your Name"
+```
+
+`mix ecto.setup` seeds `admin@aims.local` / `development-admin-1` for
+development.
+
+The token lives in `localStorage` and is sent as `Authorization: Bearer` on
+every request. A stored token is **not trusted on start-up** — the app calls
+`GET /platform/me` and falls back to the sign-in screen if the server refuses
+it, because a token can expire or be revoked while the tab is closed. Any 401
+from any request drops the token and returns the whole console to sign-in,
+rather than each panel showing its own error.
+
+Signing out revokes the token server-side, so it is dead everywhere and not
+just in this browser.
+
+---
+
 ## How it talks to the API
 
 Vite **proxies** `/api` to `http://localhost:4000`, so the browser stays on one
@@ -152,10 +181,10 @@ then shows up as a type error at the one place that reads it.
 
 ## Notes
 
-**There is no authentication.** The API accepts `x-tenant` from anyone, and
-this console sends no credentials. The bearer plumbing exists on the API side
-so nothing needs restructuring when auth lands, but as it stands this must not
-be exposed outside a trusted network.
+**Authentication is in.** Every route except `GET /health` and the two
+sign-in endpoints needs a token, and the console holds a platform
+administrator's. What is *not* in yet: password reset, multi-factor, rate
+limiting on sign-in attempts, and any audit log of who changed what.
 
 **Status colour is semantic, not decorative.** `active` reads green,
 `suspended` amber, `failed` rose, `archived` neutral — so what needs attention

@@ -158,3 +158,11 @@ export interface MigrationReport {
   migrated: string[];
   failed: { code: string; reason: string }[];
 }
+
+export interface PlatformAdmin {
+  id: number;
+  email: string;
+  name: string;
+  active: boolean;
+  inserted_at: string;
+}

@@ -1,6 +1,8 @@
 // The one place that knows how the API is shaped: everything lives under
 // `data`, and failures come back in one of two error shapes.
 
+import { currentToken, sessionLost } from "./auth";
+
 /**
  * A failure the API named — `tenant_not_found`, `only_failed_can_be_deleted`.
  * `errors.code` is a string in this shape and absent in the validation shape,
@@ -43,12 +45,20 @@ export class ValidationError extends Error {
 
 type Method = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
+interface Options {
+  /** Skip the Authorization header — for signing in, which has no token yet. */
+  anonymous?: boolean;
+}
+
 async function request<T>(
   method: Method,
   path: string,
   body?: unknown,
+  options: Options = {},
 ): Promise<T> {
   let response: Response;
+
+  const token = options.anonymous ? null : currentToken();
 
   try {
     response = await fetch(`/api/v1${path}`, {
@@ -56,6 +66,7 @@ async function request<T>(
       headers: {
         Accept: "application/json",
         ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
@@ -80,6 +91,13 @@ async function request<T>(
   }
 
   const errors = (payload as { errors?: unknown } | null)?.errors;
+
+  // The server has refused our token. Drop it and tell the app, so the whole
+  // console falls back to the sign-in screen rather than every panel showing
+  // its own "unauthenticated" error.
+  if (response.status === 401 && !options.anonymous) {
+    sessionLost();
+  }
 
   if (isNamedError(errors)) {
     throw new ApiError(response.status, errors.code, errors.detail);
@@ -120,6 +138,10 @@ export const api = {
   patch: <T>(path: string, body: unknown) => request<T>("PATCH", path, body),
   put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
   del: <T>(path: string) => request<T>("DELETE", path),
+
+  /** Signing in: no token to send, and a 401 here is an answer, not a lost session. */
+  signIn: <T>(path: string, body: unknown) =>
+    request<T>("POST", path, body, { anonymous: true }),
 };
 
 /** Turns any thrown value into something safe to render. */
