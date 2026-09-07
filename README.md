@@ -49,8 +49,7 @@ cd ../AIMS_BE
 mix aims.admin create you@example.com "Your Name"
 ```
 
-`mix ecto.setup` seeds `admin@aims.local` / `development-admin-1` for
-development.
+`mix ecto.setup` seeds `admin@aims.com` / `AIMS@123` for development.
 
 The token lives in `localStorage` and is sent as `Authorization: Bearer` on
 every request. A stored token is **not trusted on start-up** — the app calls
