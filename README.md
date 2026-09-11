@@ -147,15 +147,34 @@ vocabulary is duplicated here.
 | `/` | Counts by status, institutes needing attention, recent activity, framework and migration version |
 | `/institutes` | Filter by status and HEI category; migrate every serving institute |
 | `/institutes/new` | Onboard — creates the row, the schema, and runs the tenant migrations |
-| `/institutes/:id` | Mark scale, resolved configuration, registration details, lifecycle actions |
+| `/institutes/:id` | Mark scale, NAAC accreditation cycles, resolved configuration, registration details, lifecycle actions |
 | `/universities` | Affiliating universities, with inline create |
 | `/universities/:id` | One university, its inherited settings, and the colleges naming it |
-| `/framework` | The NAAC framework: three manuals, seven criteria, marks at UG and PG |
+| `/framework` | The NAAC framework: three manuals, seven criteria, marks at UG and PG, the grade table and the process rules |
 | `/administrators` | Platform administrators — create, deactivate, reinstate |
 
 The institute list uses the API's **summary** shape and the detail page uses the
 **full** shape. That is deliberate on the backend's side — resolving a mark
 scale costs a query per institute, so listings do not carry one.
+
+---
+
+## Accreditation cycles
+
+An institute's page shows where it stands with NAAC, read from
+`GET /api/v1/institutes/:id/cycles`:
+
+- the cycle in progress as five stages — IIQA, SSR, DVV, Visit, Result — with
+  the deadline that matters next, in red once an SSR is overdue;
+- every cycle on record, with its CGPA, grade and validity;
+- each cycle's history, step by step, and who recorded it.
+
+It is **read-only by design**. The institute's IQAC coordinator records its own
+progress through the tenant API; a platform administrator can see where every
+institute stands, but does not move one through NAAC's process on its behalf.
+
+An institute whose schema is behind the application answers 409 with the
+migration to run, and the card shows that instead of the cycles.
 
 ---
 
@@ -171,6 +190,8 @@ src/
     ui.tsx         Card, Table, Field, Button, StatusBadge, Alert…
     Layout.tsx     sidebar nav + live API status footer
     InstituteForm.tsx    create and edit, driven by the reference rules
+    CyclesCard.tsx       an institute's accreditation cycles, read-only
+    FrameworkRules.tsx   the grade table and the process rules
   pages/           one file per screen
 ```
 

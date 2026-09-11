@@ -150,6 +150,10 @@ export interface Framework {
     effective_from: string | null;
     effective_to: string | null;
     source_url: string | null;
+    /** The deadlines, windows and thresholds of the process. */
+    process_rules: ProcessRules | null;
+    /** Highest first. */
+    grades: Grade[];
   };
   manuals: Manual[];
 }
@@ -165,4 +169,132 @@ export interface PlatformAdmin {
   name: string;
   active: boolean;
   inserted_at: string;
+}
+
+// Accreditation cycles, from GET /institutes/:id/cycles. Read-only in this
+// console: an institute records its own progress through the tenant API.
+
+export type CycleStatus =
+  | "preparing"
+  | "iiqa_submitted"
+  | "iiqa_accepted"
+  | "ssr_submitted"
+  | "prequalified"
+  | "visited"
+  | "under_appeal"
+  | "accredited"
+  | "not_accredited"
+  | "iiqa_rejected"
+  | "lapsed"
+  | "not_prequalified"
+  | "dvv_terminated"
+  | "withdrawn";
+
+export interface PersonRef {
+  id: number;
+  name: string;
+}
+
+/** One step in a cycle's history. `details` depends on the step. */
+export interface CycleEvent {
+  id: number;
+  event: string;
+  from_status: CycleStatus | null;
+  to_status: CycleStatus;
+  occurred_on: string;
+  details: Record<string, string | number | boolean | null>;
+  notes: string | null;
+  recorded_by: PersonRef | null;
+  recorded_at: string;
+}
+
+export interface CycleResult {
+  declared_on: string;
+  cgpa: number | null;
+  grade: string;
+  accredited: boolean;
+  highest_grade: boolean;
+  valid_until: string | null;
+}
+
+export interface CycleAppeal {
+  intent_due_on: string | null;
+  proforma_due_on: string | null;
+  filed_on: string | null;
+  outcome: "no_change" | "re_dvv" | "re_visit" | null;
+  decided_on: string | null;
+}
+
+export interface AccreditationCycle {
+  id: number;
+  label: string;
+  kind: "cycle" | "reassessment";
+  cycle_number: number;
+  status: CycleStatus;
+  live: boolean;
+  origin: "tracked" | "recorded";
+  framework: string | null;
+  scoring_model: "cgpa" | "binary_mbgl";
+  graduated_batches: number | null;
+  iiqa: {
+    attempts: number;
+    attempts_allowed: number | null;
+    first_submitted_on: string | null;
+    submitted_on: string | null;
+    accepted_on: string | null;
+  };
+  ssr: {
+    due_on: string | null;
+    extension_days: number | null;
+    submitted_on: string | null;
+    overdue: boolean;
+  };
+  prequalification: {
+    declared_on: string | null;
+    qnm_percent: number | null;
+    threshold_percent: number | null;
+    visit_due_by: string | null;
+  };
+  visit: { from: string | null; to: string | null };
+  result: CycleResult | null;
+  appeal: CycleAppeal | null;
+  closed_on: string | null;
+  notes: string | null;
+  available_events: string[];
+  opened_by: PersonRef | null;
+  history: CycleEvent[];
+  inserted_at: string;
+  updated_at: string;
+}
+
+/** A letter grade and the CGPA range that earns it, from NAAC's Table 3. */
+export interface Grade {
+  letter: string;
+  min_cgpa: number;
+  max_cgpa: number;
+  accredited: boolean;
+  highest: boolean;
+}
+
+/** The numbers of NAAC's process, as the manuals publish them. */
+export interface ProcessRules {
+  first_cycle_min_years: number;
+  first_cycle_min_graduated_batches: number;
+  iiqa_attempts: number;
+  iiqa_attempt_window_months: number;
+  ssr_window_days: number;
+  ssr_extension_max_days: number;
+  prequalifier_qnm_percent: number;
+  reapply_after_not_prequalified_months: number;
+  visit_within_months: number;
+  reapply_after_withdrawal_months: number;
+  reapply_after_dvv_termination_months: number;
+  appeal_intent_days: number;
+  appeal_proforma_days: number;
+  reassessment_after_months: number;
+  reassessment_before_months: number;
+  reaccreditation_window_months: number;
+  validity_years: number;
+  extended_validity_years: number;
+  extended_validity_from_cycle: number;
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, formatDate, formatTime, humanise } from "../api/client";
 import { useAction, useApi } from "../api/hooks";
 import type { Accreditation, Institute, InstituteStatus } from "../api/types";
+import { CyclesCard } from "../components/CyclesCard";
 import { InstituteForm } from "../components/InstituteForm";
 import {
   Alert,
@@ -117,6 +118,11 @@ export function InstituteDetail() {
       <div className="mt-5 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
         <div className="flex flex-col gap-6">
           <ScaleCard accreditation={institute.accreditation} />
+
+          {/* An institute that never provisioned has no schema to hold cycles. */}
+          {institute.status !== "provisioning" && institute.status !== "failed" && (
+            <CyclesCard instituteId={institute.id} />
+          )}
 
           <Card title="Configuration" subtitle="Category defaults, then the affiliating university's settings, then this institute's own.">
             <dl>

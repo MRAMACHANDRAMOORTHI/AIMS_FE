@@ -2,6 +2,7 @@ import { useState } from "react";
 import { formatDate } from "../api/client";
 import { useApi } from "../api/hooks";
 import type { Framework as FrameworkData, ProgrammeLevel } from "../api/types";
+import { GradesCard, ProcessRulesCard } from "../components/FrameworkRules";
 import {
   Alert,
   Card,
@@ -153,6 +154,15 @@ export function Framework() {
             </Card>
           );
         })}
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.5fr]">
+        {data.framework.grades.length > 0 && (
+          <GradesCard grades={data.framework.grades} />
+        )}
+        {data.framework.process_rules && (
+          <ProcessRulesCard rules={data.framework.process_rules} />
+        )}
       </div>
 
       <p className="mt-6 max-w-3xl text-xs leading-relaxed text-ink-500">
