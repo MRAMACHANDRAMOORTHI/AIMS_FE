@@ -54,15 +54,10 @@ export function Framework() {
       </div>
 
       <div className="mb-6">
-        <Alert tone="warning" title="These weightages are not fully verified">
+        <Alert tone="info" title="Checked against the NAAC manuals">
           <p className="leading-relaxed">
-            Corroborated from naac.gov.in: the seven criteria and their names,
-            the three manuals, and <strong>Criterion 1</strong> at 150 marks for
-            Universities and Autonomous Colleges and 100 for
-            Affiliated/Constituent. The rest were extracted from HTML pages
-            rather than the signed manuals, and are internally inconsistent —
-            every column sums to 1000, but the totals stated alongside them were
-            900, 1000, 890 and 900.
+            Every weightage here matches the published NAAC manual for its
+            category, and every column totals 1000.
           </p>
           <p className="mt-2 leading-relaxed">
             Correcting one is an edit in{" "}

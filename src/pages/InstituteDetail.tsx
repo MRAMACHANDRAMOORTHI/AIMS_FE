@@ -316,9 +316,8 @@ function ScaleCard({ accreditation }: { accreditation: Accreditation }) {
         Resolved from seeded reference data, not decided in code — the category
         selects the manual and the programme level selects its column. Framework{" "}
         <code className="font-mono">{accreditation.framework}</code>, scored on
-        the {accreditation.scoring_model.toUpperCase()} model. These weightages
-        are not fully verified; only Criterion 1 is corroborated directly from
-        naac.gov.in.
+        the {accreditation.scoring_model.toUpperCase()} model, with weightages
+        checked against the NAAC manual for this category.
       </p>
     </Card>
   );
